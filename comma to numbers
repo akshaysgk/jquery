@@ -1,0 +1,12 @@
+
+$(document).ready(function () {
+$('#num').keyup(function(){
+var num = $('#num').val();
+$('#num').val(commaSeparateNumber(num));
+});
+
+});
+function commaSeparateNumber(val){
+   val = val.replace(/\,/g,'');
+   return val.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ",");
+  }
