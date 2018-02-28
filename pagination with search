@@ -1,0 +1,134 @@
+//html 
+//search box
+<input type="text" id="search" placeholder="Search by xxxx"/>
+
+<ul>
+<li class="search-here is-in-result" data-searchable="xxxx">data data data</li>
+<li class="search-here is-in-result" data-searchable="xxxx">data data data</li>
+<li class="search-here is-in-result" data-searchable="xxxx">data data data</li>
+<li class="search-here is-in-result" data-searchable="xxxx">data data data</li>
+<li class="search-here is-in-result" data-searchable="xxxx">data data data</li>
+</ul>
+
+//show pagination here
+<ul class="pagination" id="pagination_pages"></ul>
+
+//jquery 
+$(document).ready(function() {
+  $("#search").keyup(function(){
+            var search_word = $("#search").val().trim().toLowerCase();
+            if(search_word.length > 2){
+                $(".search-here").show();
+                $(".search-here").each(function(){
+                  var str = $(this).data("searchable");
+                  var n = str.search(search_word);
+                  if(n  < 0){
+                    $(this).hide();
+                    $(this).removeClass('is-in-result');
+                  }else{
+                    $(this).addClass('is-in-result');
+                  }
+                });
+            }else{
+              $(".search-here").show();
+              $(".search-here").addClass('is-in-result');
+            }
+            pagination();
+        });
+
+        pagination();
+
+        function pagination(){
+            var project_count = 0;
+            $(".search-here").each(function(){
+                  if($(this).hasClass("is-in-result")){
+                    project_count++;
+                  }
+                  if(project_count > 8 && $(this).hasClass("is-in-result")){
+                    $(this).hide();
+                  }
+            });
+            var pages = "";
+            if(project_count > 8){
+              var no_of_pages = Math.round(project_count/8);
+              if(no_of_pages > 1){
+                for(page_number = 1; page_number <= no_of_pages; page_number++){
+                    if(page_number == 1){
+                      pages += "<li><a href='#' class='prev_page disabled'><</a></li>";
+                      pages += "<li><a href='#' class='page_lnk first_page current_page' id='page"+page_number+"'>"+page_number+"</a></li>";
+                    }else if(page_number == no_of_pages){
+                      pages += "<li><a href='#' class='page_lnk last_page' id='page"+page_number+"'>"+page_number+"</a></li>";
+                      pages += "<li><a href='#' class='next_page'>></a></li>";                  
+                    }else{
+                      pages += "<li><a href='#' class='page_lnk' id='page"+page_number+"'>"+page_number+"</a></li>";
+                    }
+                }
+              }
+            }
+            $('#pagination_pages').html(pages);
+        }
+
+        $("body").on('click',".page_lnk",function(e){
+            e.preventDefault();
+            $('.current_page').removeClass('current_page');
+            $(this).addClass('current_page');
+            if($(this).hasClass('first_page')){
+              $('.prev_page').addClass('disabled');
+            }else{
+              $('.prev_page').removeClass('disabled');
+            }
+            if($(this).hasClass('last_page')){
+              $('.next_page').addClass('disabled');
+            }else{
+              $('.next_page').removeClass('disabled');
+            }
+            var page_number = parseInt($(this).html());
+            show_page(page_number);
+        });
+
+        $("body").on('click',".prev_page",function(e){
+            e.preventDefault();
+            var page_number = parseInt($('.current_page').html());
+            if(page_number-1 == 1){
+              $('.prev_page').addClass('disabled');
+            }else{
+              $('.prev_page').removeClass('disabled');
+            }
+            $('.next_page').removeClass('disabled');
+            var current_page = page_number-1;
+            $('#page'+current_page).addClass('current_page');
+            show_page(page_number-1);
+        });
+
+        $("body").on('click',".next_page",function(e){
+            e.preventDefault();
+            var page_number = parseInt($('.current_page').html());
+            var last_page_number = parseInt($('.last_page').html());
+            if(page_number+1 == last_page_number){
+              $('.next_page').addClass('disabled');
+            }else{
+              $('.next_page').removeClass('disabled');
+            }
+            $('.prev_page').removeClass('disabled');
+            $('.current_page').removeClass('current_page');
+            var current_page = page_number+1;
+            $('#page'+current_page).addClass('current_page');
+            show_page(page_number+1);
+        });
+
+        function show_page(page_number){
+            var project_count = 0;
+            var to = page_number*8;
+            var from = to-8;
+            $(".search-here").each(function(){
+                if($(this).hasClass("is-in-result")){
+                    project_count++;
+                }
+                if(project_count > from  && project_count < to && $(this).hasClass("is-in-result")){
+                  $(this).show();
+                }else{
+                  $(this).hide();
+                }
+            });
+        }
+});
